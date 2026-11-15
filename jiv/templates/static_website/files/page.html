@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>{{ page_name }} — {{ project_name }}</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+{% if nav %}
+  <header class="nav">
+    <div class="brand">{{ project_name }}</div>
+    <nav>
+      {% for p in pages %}
+      <a href="{{ p.file }}">{{ p.name }}</a>
+      {% endfor %}
+      {% if contact %}
+      <a href="contact.html">Contact</a>
+      {% endif %}
+    </nav>
+  </header>
+{% endif %}
+  <main class="wrap">
+    <h1>{{ page_name }}</h1>
+    <p>Replace this paragraph with your {{ page_name }} content.</p>
+  </main>
+  <footer class="wrap"><small>© {{ year }} {{ project_name }}</small></footer>
+  <script src="js/main.js"></script>
+</body>
+</html>

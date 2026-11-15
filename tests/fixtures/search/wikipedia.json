@@ -1,0 +1,4 @@
+{"query": {"search": [
+  {"title": "Oxygen", "snippet": "Oxygen is a <span>chemical</span> element with symbol O."},
+  {"title": "Ozone", "snippet": "Ozone is a triatomic form of oxygen."}
+]}}

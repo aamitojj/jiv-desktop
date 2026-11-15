@@ -1,0 +1,15 @@
+/* {{ project_name }} */
+:root { --fg:#1a1a1a; --bg:#f7f4ef; --acc:#2c6e49; --card:#fff; --bd:#e2dcd3; }
+* { box-sizing: border-box; }
+body { margin:0; font: 16px/1.55 system-ui, sans-serif; color:var(--fg); background:var(--bg); }
+.nav { display:flex; justify-content:space-between; align-items:center; padding:12px 24px; background:#fff; border-bottom:1px solid var(--bd); }
+.nav .brand { font-weight:700; }
+.nav nav a { margin-left:16px; color:var(--acc); text-decoration:none; }
+.wrap { max-width:900px; margin:0 auto; padding:32px 20px; }
+.cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:16px; }
+.card { background:var(--card); border:1px solid var(--bd); border-radius:12px; padding:16px; }
+.form { display:flex; flex-direction:column; gap:10px; max-width:480px; }
+.form input, .form textarea { width:100%; padding:8px; font:inherit; }
+button { background:var(--acc); color:#fff; border:0; padding:8px 16px; border-radius:8px; cursor:pointer; }
+.muted { color:#666; font-size:14px; }
+footer { border-top:1px solid var(--bd); }

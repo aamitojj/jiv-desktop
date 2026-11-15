@@ -1,0 +1,29 @@
+{
+  "id": "java_console",
+  "name": "Java console app",
+  "kind": "java",
+  "description": "Command-line Java program. Compiled with javac, or Maven if you tick the option and Maven is already installed. Nothing is downloaded when the project is created.",
+  "options": [
+    {
+      "id": "maven",
+      "type": "checkbox",
+      "label": "Also write a pom.xml (Maven optional; javac still works)",
+      "default": false
+    }
+  ],
+  "files": [
+    {
+      "src": "Main.java",
+      "dest": "src/{{ package_path }}/Main.java"
+    },
+    {
+      "src": "README.md",
+      "dest": "README.md"
+    },
+    {
+      "src": "pom.xml",
+      "dest": "pom.xml",
+      "when": "maven"
+    }
+  ]
+}

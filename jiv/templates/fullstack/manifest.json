@@ -1,0 +1,16 @@
+{
+  "id": "fullstack",
+  "name": "HTML + Java (JSON file store)",
+  "kind": "fullstack",
+  "description": "Static HTML frontend plus a JDK HTTP backend. Data is saved in data/items.json (no SQLite/H2 driver to download). CORS is open for local use.",
+  "options": [
+    {"id": "port", "type": "number", "label": "API port", "default": 8080}
+  ],
+  "files": [
+    {"src": "Server.java", "dest": "src/{{ package_path }}/Server.java"},
+    {"src": "frontend/index.html", "dest": "frontend/index.html"},
+    {"src": "frontend/app.js", "dest": "frontend/app.js"},
+    {"src": "frontend/style.css", "dest": "frontend/style.css"},
+    {"src": "README.md", "dest": "README.md"}
+  ]
+}

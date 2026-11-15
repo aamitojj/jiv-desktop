@@ -1,0 +1,147 @@
+name: Build Windows installer
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  tests:
+    name: Unit tests (no Ollama needed)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    continue-on-error: true   # report-only: a failing unit test does not block the installer build
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install -r requirements.txt
+      - name: Run tests/test_*.py
+        shell: bash
+        run: |
+          failed=""
+          for t in tests/test_*.py; do
+            echo "::group::$t"
+            if python "$t"; then echo "OK $t"; else failed="$failed $t"; fi
+            echo "::endgroup::"
+          done
+          if [ -n "$failed" ]; then
+            echo "::warning::Failing test files:$failed"
+            echo "Failing:$failed" >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+          echo "All test files passed" >> "$GITHUB_STEP_SUMMARY"
+
+  build-windows:
+    name: Build JivSetup.exe
+    runs-on: windows-latest
+    timeout-minutes: 30
+    env:
+      PYVER: "3.12.10"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          architecture: x64
+
+      - name: Read version
+        id: ver
+        shell: bash
+        run: |
+          V=$(python -c "import re;print(re.search(r'\"(.+)\"', open('jiv/__init__.py').read()).group(1))")
+          echo "version=$V" >> "$GITHUB_OUTPUT"
+          echo "Jiv version: $V"
+          if [[ "$GITHUB_REF" == refs/tags/v* && "${GITHUB_REF_NAME#v}" != "$V" ]]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match jiv/__init__.py version $V"; exit 1
+          fi
+
+      - name: Install build tools (NSIS, MinGW) if missing
+        shell: pwsh
+        run: |
+          if (-not (Get-Command makensis -ErrorAction SilentlyContinue) -and -not (Test-Path "${env:ProgramFiles(x86)}\NSIS\makensis.exe")) {
+            choco install nsis -y --no-progress
+          }
+          "${env:ProgramFiles(x86)}\NSIS" | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8
+          if (-not (Get-Command gcc -ErrorAction SilentlyContinue)) {
+            if (Test-Path C:\mingw64\bin\gcc.exe) { "C:\mingw64\bin" | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8 }
+            else { choco install mingw -y --no-progress; "C:\ProgramData\mingw64\mingw64\bin" | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8 }
+          }
+
+      - name: Stage embedded Python + dependencies
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $stage = Join-Path $env:RUNNER_TEMP "stage"
+          New-Item -ItemType Directory -Force "$stage\python", "$stage\app", "$env:RUNNER_TEMP\wheels" | Out-Null
+          $emb = "$env:RUNNER_TEMP\python-$env:PYVER-embed-amd64.zip"
+          Invoke-WebRequest "https://www.python.org/ftp/python/$env:PYVER/python-$env:PYVER-embed-amd64.zip" -OutFile $emb
+          Expand-Archive $emb -DestinationPath "$stage\python"
+          $pth = Get-ChildItem "$stage\python\python3*._pth" | Select-Object -First 1
+          $zipn = $pth.BaseName + ".zip"
+          [IO.File]::WriteAllText($pth.FullName, "$zipn`r`n.`r`nLib\site-packages`r`n..\app`r`nimport site`r`n")
+          python -m pip download -q --only-binary=:all: --platform win_amd64 --python-version 3.12 --implementation cp `
+            -d "$env:RUNNER_TEMP\wheels" -r requirements.txt colorama pip
+          if ($LASTEXITCODE) { throw "pip download failed" }
+          $sp = "$stage\python\Lib\site-packages"; New-Item -ItemType Directory -Force $sp | Out-Null
+          Get-ChildItem "$env:RUNNER_TEMP\wheels\*.whl" | ForEach-Object { python -m zipfile -e $_.FullName $sp; if ($LASTEXITCODE) { throw "unzip $_" } }
+          # app source = committed files only (no keys, caches or local data can leak in)
+          git archive --format=zip -o "$env:RUNNER_TEMP\app.zip" HEAD
+          Expand-Archive "$env:RUNNER_TEMP\app.zip" -DestinationPath "$stage\app"
+          Remove-Item -Recurse -Force "$stage\app\screenshots", "$stage\app\.github" -ErrorAction SilentlyContinue
+          "STAGE=$stage" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+
+      - name: Smoke-test embedded Python imports
+        shell: pwsh
+        run: |
+          & "$env:STAGE\python\python.exe" -c "import fastapi, uvicorn, httpx, pydantic, cryptography, pypdf, openpyxl, jiv; print('jiv', jiv.__version__, 'imports OK')"
+          if ($LASTEXITCODE) { throw "embedded python import failed" }
+
+      - name: Build launcher (JivDesktop.exe)
+        shell: pwsh
+        working-directory: installer
+        run: |
+          windres launcher.rc -O coff -o "$env:STAGE\launcher.res" -I .
+          if ($LASTEXITCODE) { throw "windres failed" }
+          gcc -O2 -s -municode -mwindows launcher.c "$env:STAGE\launcher.res" -o "$env:STAGE\JivDesktop.exe"
+          if ($LASTEXITCODE) { throw "gcc failed" }
+
+      - name: makensis
+        shell: pwsh
+        working-directory: installer
+        run: |
+          New-Item -ItemType Directory -Force ..\dist | Out-Null
+          makensis /V2 "/DVERSION=${{ steps.ver.outputs.version }}" "/DSTAGE=$env:STAGE" "/DOUTFILE=$((Resolve-Path ..\dist).Path)\JivSetup.exe" jiv.nsi
+          if ($LASTEXITCODE) { throw "makensis failed" }
+          Get-Item ..\dist\JivSetup.exe | Format-List Name, Length
+
+      - name: Portable zip
+        shell: pwsh
+        run: |
+          $p = "$env:RUNNER_TEMP\portable\JivDesktop"
+          New-Item -ItemType Directory -Force $p | Out-Null
+          Copy-Item "$env:STAGE\JivDesktop.exe", installer\jiv.ico, installer\LICENSE.txt $p
+          Copy-Item -Recurse "$env:STAGE\python", "$env:STAGE\app" $p
+          Compress-Archive -Path $p -DestinationPath "dist\JivDesktop-portable-win64.zip"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: JivSetup-${{ steps.ver.outputs.version }}
+          path: |
+            dist/JivSetup.exe
+            dist/JivDesktop-portable-win64.zip
+
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Jiv Desktop ${{ steps.ver.outputs.version }}
+          files: |
+            dist/JivSetup.exe
+            dist/JivDesktop-portable-win64.zip
+          generate_release_notes: true

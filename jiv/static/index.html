@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="jiv-token" content="__JIV_TOKEN__">
+<title>Jiv Desktop</title>
+<link rel="icon" href="/static/icon.svg">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div id="app">
+  <aside id="sidebar">
+    <div class="brand"><img src="/static/icon.svg" alt=""><span>Jiv Desktop</span></div>
+    <button id="newChat" class="primary wide">＋ New chat</button>
+    <div class="sec-title">Agents <button id="addAgent" class="icon" title="New agent">＋</button></div>
+    <div id="agents"></div>
+    <div class="sec-title">Conversations</div>
+    <div id="convs"></div>
+    <div class="side-foot">
+      <button id="openSettings" class="ghost">⚙ Settings</button>
+      <button id="openAudit" class="ghost">📜 Audit</button>
+      <button id="openModels" class="ghost">📦 Models</button>
+      <button id="openUpdates" class="ghost">⬆ Updates</button>
+      <button id="openMemory" class="ghost">🧠 Memory</button>
+      <button id="openSkills" class="ghost">🛠 Skills</button>
+      <button id="openLanguages" class="ghost">{ } Languages</button>
+      <button id="openBuilder" class="ghost">🧱 Builder</button>
+      <button id="openBatch" class="ghost">⚡ Batch</button>
+      <button id="toggleTheme" class="ghost" title="Theme">◐</button>
+    </div>
+  </aside>
+  <main>
+    <header id="topbar">
+      <div><span id="agentName">Jiv</span> <span id="modelBadge" class="badge"></span></div>
+      <div class="hstack"><button id="exportChat" class="ghost" title="Export this chat as Markdown (Ctrl+Shift+E)">⤓ Export</button><span id="updNotice" class="hidden"></span><span id="connStatus" class="muted"></span></div>
+    </header>
+    <div id="connBanner" class="hidden" role="alert"></div>
+    <div id="tips" class="tips hidden"><b>💡 Tips for small models:</b> say exactly what you want (topic, how many, level, format) ·
+      one task per message · for more than ~20 items use ⚡ Batch · press ↻ Regenerate or ✎ Edit if an answer is off · 👍/👎 teach Jiv
+      <button class="icon" data-closetips="1" title="Hide tips">✕</button></div>
+    <div id="messages"></div>
+    <div id="attachChips" class="hidden"></div>
+    <form id="composer">
+      <button type="button" id="attachBtn" class="icon attach" title="Attach files (or drag &amp; drop, or paste)">📎</button>
+      <input type="file" id="attachInput" multiple hidden>
+      <textarea id="input" rows="1" placeholder="Message Jiv…  (Enter to send, Shift+Enter for a new line)"></textarea>
+      <button type="submit" id="send" class="primary">Send</button>
+      <button type="button" id="stop" class="danger hidden">■ Stop</button>
+      <span id="meter" class="meter muted small hidden"></span>
+    </form>
+  </main>
+</div>
+
+<div id="dropZone" class="hidden"><div>📎 Drop files to attach</div></div>
+<div id="modal" class="hidden"><div class="card" id="modalCard"></div></div>
+<script src="/static/md.js"></script>
+<script src="/static/attach.js"></script>
+<script src="/static/app.js"></script>
+<script src="/static/learning.js"></script>
+<script src="/static/batch.js"></script>
+<script src="/static/builder.js"></script>
+<script src="/static/wizard.js"></script>
+<script src="/static/updates.js"></script>
+<script src="/static/export.js"></script>
+</body>
+</html>

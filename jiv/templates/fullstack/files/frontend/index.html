@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>{{ project_name }}</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="wrap">
+    <h1>{{ project_name }}</h1>
+    <p class="muted">Frontend talks to the Java API at <code>http://127.0.0.1:{{ port }}</code>. Start the backend first (Builder → Run), then open this page.</p>
+    <form id="f">
+      <input name="name" placeholder="New item" required>
+      <button type="submit">Add</button>
+    </form>
+    <ul id="list"></ul>
+    <p id="status" class="muted"></p>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>

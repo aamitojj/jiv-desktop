@@ -1,0 +1,28 @@
+Jiv Desktop - MIT License
+
+Copyright (c) 2026 Jiv Desktop contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of
+the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+-------------------------------------------------------------------------------------------------------------------
+WHAT THIS INSTALLS
+- Jiv Desktop into %LOCALAPPDATA%\Programs\JivDesktop (just for you, no administrator rights needed).
+- A private copy of Python 3.12 (python.org embeddable build, PSF License - see python\LICENSE.txt) with
+  FastAPI, Uvicorn, httpx, Pydantic and cryptography (MIT/BSD/Apache licences).
+- Your chats, agents and settings are kept in %APPDATA%\JivDesktop. Upgrading keeps them; uninstalling keeps them
+  unless you tick "Also delete my data".
+- Jiv runs on your computer only (http://127.0.0.1). If Ollama is already installed, its models are found
+  automatically; otherwise the Setup Wizard can install it for you.
+- This installer is not code-signed. If Windows SmartScreen says "Windows protected your PC", click
+  "More info" and then "Run anyway".

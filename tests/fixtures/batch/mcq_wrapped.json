@@ -1,0 +1,149 @@
+{
+  "title": "Practice set",
+  "questions": [
+    {
+      "id": 1,
+      "question": "What is 22 + 11?",
+      "options": [
+        "33",
+        "35",
+        "43",
+        "30"
+      ],
+      "answer": "A",
+      "topic": "arithmetic"
+    },
+    {
+      "id": 2,
+      "question": "What is 25 + 39?",
+      "options": [
+        "74",
+        "65",
+        "61",
+        "64"
+      ],
+      "answer": "D",
+      "topic": "arithmetic"
+    },
+    {
+      "id": 3,
+      "question": "What is 29 + 28?",
+      "options": [
+        "67",
+        "57",
+        "58",
+        "56"
+      ],
+      "answer": "B",
+      "topic": "arithmetic"
+    },
+    {
+      "id": 4,
+      "question": "What is 5 + 54?",
+      "options": [
+        "69",
+        "58",
+        "62",
+        "59"
+      ],
+      "answer": "D",
+      "topic": "arithmetic"
+    },
+    {
+      "id": 5,
+      "question": "What is 38 + 39?",
+      "options": [
+        "87",
+        "79",
+        "76",
+        "77"
+      ],
+      "answer": "D",
+      "topic": "arithmetic"
+    },
+    {
+      "id": 6,
+      "question": "What is 20 + 28?",
+      "options": [
+        "58",
+        "48",
+        "49",
+        "45"
+      ],
+      "answer": "B",
+      "topic": "arithmetic"
+    },
+    {
+      "id": 7,
+      "question": "What is 37 + 54?",
+      "options": [
+        "91",
+        "101",
+        "94",
+        "90"
+      ],
+      "answer": "A",
+      "topic": "arithmetic"
+    },
+    {
+      "id": 8,
+      "question": "What is 25 + 8?",
+      "options": [
+        "33",
+        "43",
+        "36",
+        "30"
+      ],
+      "answer": "A",
+      "topic": "arithmetic"
+    },
+    {
+      "id": 9,
+      "question": "What is 41 + 15?",
+      "options": [
+        "53",
+        "58",
+        "56",
+        "66"
+      ],
+      "answer": "C",
+      "topic": "arithmetic"
+    },
+    {
+      "id": 10,
+      "question": "What is 39 + 31?",
+      "options": [
+        "80",
+        "72",
+        "68",
+        "70"
+      ],
+      "answer": "D",
+      "topic": "arithmetic"
+    },
+    {
+      "id": 11,
+      "question": "What is 7 + 38?",
+      "options": [
+        "42",
+        "47",
+        "45",
+        "55"
+      ],
+      "answer": "C",
+      "topic": "arithmetic"
+    },
+    {
+      "id": 12,
+      "question": "What is 20 + 40?",
+      "options": [
+        "61",
+        "60",
+        "59",
+        "70"
+      ],
+      "answer": "B",
+      "topic": "arithmetic"
+    }
+  ]
+}

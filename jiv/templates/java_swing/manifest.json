@@ -1,0 +1,26 @@
+{
+  "id": "java_swing",
+  "name": "Java desktop (Swing)",
+  "kind": "java",
+  "description": "Desktop window with a menu and N card-style screens. Needs a JDK to compile and run. No extra libraries.",
+  "options": [
+    {
+      "id": "screens",
+      "type": "number",
+      "label": "Number of screens (1\u201312)",
+      "default": 3,
+      "min": 1,
+      "max": 12
+    }
+  ],
+  "files": [
+    {
+      "src": "Main.java",
+      "dest": "src/{{ package_path }}/Main.java"
+    },
+    {
+      "src": "README.md",
+      "dest": "README.md"
+    }
+  ]
+}

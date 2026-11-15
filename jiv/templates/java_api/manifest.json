@@ -1,0 +1,24 @@
+{
+  "id": "java_api",
+  "name": "Java REST API",
+  "kind": "java",
+  "description": "Small HTTP API using the JDK's built-in com.sun.net.httpserver (no Spring, no Maven download). Stores items in a JSON file.",
+  "options": [
+    {
+      "id": "port",
+      "type": "number",
+      "label": "Listen port",
+      "default": 8080
+    }
+  ],
+  "files": [
+    {
+      "src": "Server.java",
+      "dest": "src/{{ package_path }}/Server.java"
+    },
+    {
+      "src": "README.md",
+      "dest": "README.md"
+    }
+  ]
+}

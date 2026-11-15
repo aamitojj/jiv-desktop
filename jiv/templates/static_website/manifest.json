@@ -1,0 +1,53 @@
+{
+  "id": "static_website",
+  "name": "Static website",
+  "kind": "web",
+  "description": "Multi-page HTML/CSS/JS site with a shared nav. Optional contact form. Package as a Netlify-ready zip. No build tools required.",
+  "options": [
+    {
+      "id": "pages",
+      "type": "text",
+      "label": "Pages (comma-separated)",
+      "default": "Home, About, Services"
+    },
+    {
+      "id": "contact",
+      "type": "checkbox",
+      "label": "Include a contact form page",
+      "default": true
+    },
+    {
+      "id": "nav",
+      "type": "checkbox",
+      "label": "Show a top navigation bar",
+      "default": true
+    }
+  ],
+  "files": [
+    {
+      "src": "index.html",
+      "dest": "index.html"
+    },
+    {
+      "src": "page.html",
+      "dest": "page.html"
+    },
+    {
+      "src": "contact.html",
+      "dest": "contact.html",
+      "when": "contact"
+    },
+    {
+      "src": "css/style.css",
+      "dest": "css/style.css"
+    },
+    {
+      "src": "js/main.js",
+      "dest": "js/main.js"
+    },
+    {
+      "src": "README.md",
+      "dest": "README.md"
+    }
+  ]
+}

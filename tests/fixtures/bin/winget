@@ -1,0 +1,13 @@
+#!/bin/sh
+# Fake winget for tests: "installs" a runtime by dropping a stub into $FAKE_WINGET_BIN
+echo "Found $4 [$4] Version 1.0.0-fake"
+echo "Downloading https://example.invalid/$4.msi"
+echo "Successfully verified installer hash"
+echo "Starting package install..."
+BIN="${FAKE_WINGET_BIN:-/tmp/fakewinget}"; mkdir -p "$BIN"
+case "$4" in
+  OpenJS.NodeJS.LTS) printf '#!/bin/sh\necho v22.11.0-fake\n' > "$BIN/node"; chmod +x "$BIN/node";;
+  PHP.PHP.8.3) printf '#!/bin/sh\necho "PHP 8.3.33-fake (cli)"\n' > "$BIN/php"; chmod +x "$BIN/php";;
+  Bad.Package) echo "No package found matching input criteria."; exit 1;;
+esac
+echo "Successfully installed"

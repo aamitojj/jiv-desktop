@@ -1,0 +1,15 @@
+#!/bin/sh
+# Fake Homebrew for tests/wizard_mac_test.py: "installs" an ollama that serves tests/mock_llm.py
+HERE="$(cd "$(dirname "$0")/../.." && pwd)"
+PY="${MOCK_PYTHON:-python3}"
+DEST="${FAKE_BREW_OLLAMA:-/tmp/fakebrew/ollama/ollama}"
+echo "brew $@"
+if [ "$1" = "install" ]; then
+  mkdir -p "$(dirname "$DEST")"
+  printf '#!/bin/sh\nPORT=$(echo "$OLLAMA_HOST" | sed "s/.*://")\nexec %s %s/mock_llm.py "$PORT"\n' "$PY" "$HERE" > "$DEST"
+  chmod +x "$DEST"; echo "==> ollama installed"
+fi
+if [ "$1" = "services" ]; then
+  OLLAMA_HOST=127.0.0.1:${FAKE_BREW_PORT:-11701} nohup "$DEST" serve >/dev/null 2>&1 &
+  echo "==> Successfully started ollama"
+fi
