@@ -23,6 +23,9 @@ SAFE_NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._\- ]{0,59}$")
 JAVA_ERR = re.compile(
     r"^(?P<file>\S.*?):(?P<line>\d+):(?:(?P<col>\d+):)?\s*(?P<kind>error|warning):\s*(?P<msg>.*)$", re.M)
 # also "File.java:12: error:" without column
+# Maven (maven-compiler-plugin): "[ERROR] /path/Main.java:[12,34] message" / "[WARNING] /path/Main.java:[5,1] message"
+MVN_ERR = re.compile(
+    r"^\[(?P<kind>ERROR|WARNING)\]\s+(?P<file>\S.*?\.(?:java|kt|groovy|scala)):\[(?P<line>\d+)(?:,(?P<col>\d+))?\]\s*(?P<msg>.*)$", re.M)
 SKIP_DIR = {".git", "__pycache__", "node_modules", "target", "out", "build", ".idea", ".gradle"}
 SKIP_FILE = {".class", ".jar", ".exe", ".zip", ".log"}
 
@@ -590,6 +593,12 @@ def parse_errors(text: str):
     for m in JAVA_ERR.finditer(text or ""):
         out.append({"file": m.group("file"), "line": int(m.group("line")),
                     "col": int(m.group("col") or 0), "kind": m.group("kind"), "msg": m.group("msg")})
+    seen = {(e["file"], e["line"], e["col"]) for e in out}
+    for m in MVN_ERR.finditer(text or ""):
+        key = (m.group("file"), int(m.group("line")), int(m.group("col") or 0))
+        if key in seen: continue
+        seen.add(key)
+        out.append({"file": key[0], "line": key[1], "col": key[2], "kind": m.group("kind").lower(), "msg": m.group("msg")})
     return out
 
 JOBS = {}

@@ -75,8 +75,8 @@ async function openUpdates(focusId) {
    <h3>Get updates</h3>
    <div class="hstack"><button class="primary" id="uCheck">🔄 Check for updates</button>
      <label class="filebtn"><input type="file" id="uFile" accept=".jivupdate,.zip" hidden><span class="btnlike">📦 Install update file…</span></label><span id="uMsg" class="muted"></span></div>
-   <details class="usrc" ${u.repo ? "" : "open"}><summary>Source: ${u.repo ? `<code>${esc(u.repo)}</code>` : "<i>no GitHub repository set</i>"}</summary>
-     <div class="row"><label>GitHub repo</label><input id="uRepo" placeholder="owner/repo or https://github.com/owner/repo" value="${esc(u.repo || "")}"></div>
+   <details class="usrc"><summary>Source: <code>${esc(u.repo)}</code>${u.repo_is_default ? ' <span class="muted small">(official, default)</span>' : ""}</summary>
+     <div class="row"><label>GitHub repo</label><input id="uRepo" placeholder="${esc(u.default_repo || "owner/repo")} (leave empty for the official repo)" value="${esc(u.repo_is_default ? "" : (u.repo || ""))}"></div>
      <div class="row"><label>Automatic</label><label class="hstack"><input type="checkbox" id="uAuto" style="width:auto" ${u.auto_install_signed ? "checked" : ""}> Auto-install <b>signed</b> updates from my GitHub (notifies you and restarts only when Jiv is idle)</label></div>
      <div class="hstack" style="justify-content:flex-end"><button id="uSaveSrc">Save source</button></div></details>
    <h3>Ready to install</h3><div id="uStaged">${u.staged.filter(s => !s.applied).length ? "" : '<div class="muted">Nothing waiting. Check for updates, add a file, or ask Jiv to write one ("add a feature that…").</div>'}</div>

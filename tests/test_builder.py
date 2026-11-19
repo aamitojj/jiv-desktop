@@ -82,6 +82,12 @@ check("parse javac file:line error and file:line:col warning",
       len(got) == 2 and got[0]["file"].endswith("Main.java") and got[0]["line"] == 12
       and got[0]["kind"] == "error" and "symbol" in got[0]["msg"]
       and got[1]["line"] == 3 and got[1]["col"] == 5 and got[1]["kind"] == "warning", got)
+mvn = ("[ERROR] COMPILATION ERROR :\n[ERROR] /p/src/com/jiv/demo/Main.java:[3,45] <identifier> expected\n"
+       "[WARNING] /p/src/Util.java:[7] unchecked call\n[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.11.0:compile\n")
+gm = B.parse_errors(mvn)
+check("parse Maven File.java:[line,col] errors and warnings (1.6.3)",
+      len(gm) == 2 and gm[0]["file"].endswith("Main.java") and gm[0]["line"] == 3 and gm[0]["col"] == 45 and gm[0]["kind"] == "error"
+      and gm[1]["line"] == 7 and gm[1]["kind"] == "warning", gm)
 
 # ---- context / templates present ----
 ids = {t["id"] for t in B.list_templates()}
@@ -285,7 +291,7 @@ try:
             break
         except Exception:
             time.sleep(0.25)
-    check("app starts for Builder API without a model / Ollama", bool(tok) and httpx.get(BURL + "/health", timeout=2).json().get("version") == "1.6.2")
+    check("app starts for Builder API without a model / Ollama", bool(tok) and httpx.get(BURL + "/health", timeout=2).json().get("version") == __import__("jiv").__version__)
     if tok:
         c = httpx.Client(base_url=BURL, headers={"X-Jiv-Token": tok}, timeout=30)
         tpls = c.get("/api/builder/templates").json()["templates"]

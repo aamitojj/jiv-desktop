@@ -346,6 +346,19 @@ def apply_package(pkg, advanced=False, allow_unsigned=True):
     return {"backup": backup, "version": man["version"], "info": info}
 
 # ---------------- GitHub releases ----------------
+# Official public repo: used by "Check for updates" when the user has not set their own (1.6.3).
+DEFAULT_REPO = "aamitojj/jiv-desktop"
+
+def effective_repo(configured):
+    return (configured or "").strip() or DEFAULT_REPO
+
+def _pick_package(assets):
+    """Choose the .jivupdate asset: prefer an all-in-one (cumulative) package, then the newest-looking name."""
+    pk = [a for a in assets if a.get("name", "").lower().endswith(".jivupdate")]
+    if not pk: return None
+    pk.sort(key=lambda a: ("all-in-one" in a["name"].lower(), a.get("size", 0)), reverse=True)
+    return pk[0]
+
 def parse_repo(s):
     s = (s or "").strip().rstrip("/")
     m = re.search(r"(?:github\.com[/:])?([\w.-]+)/([\w.-]+?)(?:\.git)?$", s)
@@ -358,18 +371,22 @@ async def check_github(repo, download=True):
     api = os.environ.get("JIV_GITHUB_API", "https://api.github.com").rstrip("/")
     async with httpx.AsyncClient(timeout=20, follow_redirects=True, headers={"Accept": "application/vnd.github+json", "User-Agent": "JivDesktop"}) as c:
         r = await c.get(f"{api}/repos/{owner}/{name}/releases/latest")
-        if r.status_code == 404: return {"available": False, "message": "No releases published yet."}
+        if r.status_code == 404: return {"available": False, "repo": f"{owner}/{name}",
+                                         "message": f"No releases published yet (or {owner}/{name} is private/not found)."}
+        if r.status_code in (403, 429) and "rate limit" in r.text.lower():
+            return {"available": False, "repo": f"{owner}/{name}", "error": "GitHub rate limit reached (60 checks/hour without sign-in). Try again later."}
         r.raise_for_status(); rel = r.json()
         latest = (rel.get("tag_name") or "").lstrip("vV")
-        res = {"latest": latest, "current": __version__, "notes": rel.get("body") or "", "url": rel.get("html_url"),
+        res = {"repo": f"{owner}/{name}", "latest": latest, "current": __version__, "notes": rel.get("body") or "", "url": rel.get("html_url"),
                "available": vtuple(latest) > vtuple(__version__)}
-        asset = next((a for a in rel.get("assets", []) if a.get("name", "").endswith(".jivupdate")), None)
+        asset = _pick_package(rel.get("assets", []))
         inst = next((a for a in rel.get("assets", []) if re.match(r"(?i)^JivSetup.*\.exe$", a.get("name", ""))), None)
         if inst: res["installer"] = {"name": inst["name"], "url": inst["browser_download_url"], "size": inst.get("size", 0), "version": latest}
         if not res["available"]: res["message"] = f"You're up to date ({__version__})."; return res
         if not asset:
             res["message"] = (f"Version {latest} is a full reinstall: download and run its installer (JivSetup.exe)." if inst
                               else f"Version {latest} is out, but the release has no .jivupdate file."); return res
+        res["package"] = {"name": asset["name"], "url": asset["browser_download_url"], "size": asset.get("size", 0)}
         if not download: return res
         b = await c.get(asset["browser_download_url"]); b.raise_for_status()
         if len(b.content) > MAX_PACKAGE: raise UpdateError("release asset too large")

@@ -19,6 +19,16 @@ Available tools:
 {tools}
 """
 
+def _param_sig(props):
+    """Compact parameter list for small models' JSON-fallback prompt: name (type|enum), ... (1.6.3, keeps the prompt < 10k chars)."""
+    out = []
+    for k, v in (props or {}).items():
+        v = v or {}
+        t = "|".join(map(str, v["enum"])) if v.get("enum") else v.get("type", "any")
+        if t == "array" and isinstance(v.get("items"), dict): t = f"list of {v['items'].get('type', 'any')}"
+        out.append(f"{k} ({t})")
+    return ", ".join(out) or "none"
+
 def _balanced_objects(s):
     """Yield top-level {...} substrings (string-aware)."""
     depth, start, ins, esc = 0, None, False, False
@@ -424,7 +434,9 @@ class Runner:
             self.last_memories = list(getattr(self.learn, "last_used", []) or [])
         p += (TOOL_GUIDE_SMALL + SELF_UPDATE_RULES_SMALL) if small else SELF_UPDATE_RULES
         if fallback:
-            lines = [f"- {s['function']['name']}: {s['function']['description']} params={json.dumps(s['function']['parameters']['properties'])}"
+            lines = [f"- {s['function']['name']}: {s['function']['description']} "
+                     + (f"params: {_param_sig(s['function']['parameters']['properties'])}" if small
+                        else f"params={json.dumps(s['function']['parameters']['properties'])}")
                      for s in T.schemas(allowed, small)]
             p += FALLBACK_INSTR.format(tools="\n".join(lines))
         return p

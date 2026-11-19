@@ -177,7 +177,7 @@ try:
         check(f"UI has {k}", k in js)
     for k in ('id="tips"', 'id="connBanner"', 'id="meter"', 'id="stop"'):
         check(f"index.html has {k}", k in html)
-    check("version is 1.6.2", __import__("jiv").__version__ == "1.6.2")
+    check("version is 1.6.x", __import__("jiv").__version__.startswith("1.6."))
 finally:
     mock.terminate(); srv.should_exit = True
 print(f"\n{sum(res)}/{len(res)} passed"); sys.exit(0 if all(res) else 1)

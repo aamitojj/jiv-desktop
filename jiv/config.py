@@ -45,7 +45,7 @@ DEFAULTS = {
     "max_steps": 12,
     "ollama_url": "http://localhost:11434",
     "setup_done": False,
-    "update_repo": "",            # e.g. "yourname/jiv-desktop" – GitHub Releases with a .jivupdate asset
+    "update_repo": "",            # empty = official aamitojj/jiv-desktop; or "yourname/jiv-desktop" – GitHub Releases with a .jivupdate asset
     "auto_install_signed": False, # install SIGNED updates from that repo automatically (when idle)
     "update_test_cmd": "",        # test command for self-made updates ("" = default)
     # 1.6.1 search / summarise

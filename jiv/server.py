@@ -686,7 +686,8 @@ def _pkg_view(meta):
 @app.get("/api/updates")
 async def updates_state():
     return {"version": __version__, "staged": UP.staged_list(), "backups": UP.list_backups(), "state": UP.read_state(),
-            "repo": cfg.get("update_repo"), "auto_install_signed": cfg.get("auto_install_signed"),
+            "repo": UP.effective_repo(cfg.get("update_repo")), "repo_is_default": not (cfg.get("update_repo") or "").strip(),
+            "default_repo": UP.DEFAULT_REPO, "auto_install_signed": cfg.get("auto_install_signed"),
             "restart_supported": _restart_supported(), "frozen": FROZEN, "notice": UPDATE_NOTICE, "layout": UP.layout(), "installer": LAST_INSTALLER, "app_dir": str(UP.APP_DIR)}
 
 @app.get("/api/updates/staged/{sid}")
@@ -703,8 +704,7 @@ async def updates_upload(req: Request):
 
 @app.post("/api/updates/check")
 async def updates_check():
-    repo = cfg.get("update_repo")
-    if not repo: return {"configured": False, "message": "No update repository set. Add one in Updates → Source."}
+    repo = UP.effective_repo(cfg.get("update_repo"))  # empty = the official public repo
     try:
         global LAST_INSTALLER
         r = await UP.check_github(repo)
@@ -784,8 +784,8 @@ async def auto_update_loop():
     await asyncio.sleep(float(os.environ.get("JIV_UPDATE_FIRST_CHECK", 60)))
     while True:
         try:
-            if cfg.get("auto_install_signed") and cfg.get("update_repo") and _restart_supported():
-                r = await UP.check_github(cfg.get("update_repo"))
+            if cfg.get("auto_install_signed") and _restart_supported():
+                r = await UP.check_github(UP.effective_repo(cfg.get("update_repo")))
                 st = r.get("staged")
                 if st and st.get("ok") and st.get("signed"):
                     UPDATE_NOTICE.clear(); UPDATE_NOTICE.update(id=st["id"], version=r["latest"], status="waiting_idle",

@@ -3,6 +3,7 @@
 Your own AI agent for **Windows and macOS** (Linux works too). Jiv runs on your PC, connects to any open-source AI (Ollama, LM Studio, llama.cpp, vLLM, Jan, LocalAI, or cloud services like OpenRouter, Groq and Together), chats with you like a modern assistant, uses tools on your computer **only with your permission**, and can create and manage more agents when you ask.
 
 ## Features
+- **⬆ Updates from the official repo (1.6.3).** *Check for updates* works with no setup: it checks the public [aamitojj/jiv-desktop](https://github.com/aamitojj/jiv-desktop/releases) releases, downloads the signed all-in-one `.jivupdate` if there is one, or offers `JivSetup.exe`. Also fixes Maven error highlighting in the Builder and makes the small-model prompt more compact.
 - **✎ Clearer English (1.6.2).** Better reading/summaries (abbreviations, negation-aware extracts, readable polish) and a light polish on Jiv’s own replies. `grammar_check` tool for sentences you ask it to correct. Settings → Polish Jiv’s English.
 - **🔎 Search & summarise (1.6.1).** Web search with DuckDuckGo (+ optional SearXNG, Wikipedia), readable page fetch, disk cache, and a grounded extractive summary with [n] citations that works with no AI.
 - **🧱 Builder (1.6.0).** Create a static website or a Java app from a local template, with no AI and no model running. Editor, snippets, Build / Run / Package, and a local site preview. Writes stay in the project folder and use the same permission cards and audit log. Chat is optional and separate.
@@ -38,8 +39,8 @@ The wizard opens the first time you start Jiv. To run it again later, open **Set
 **How the recommendation works:** memory needed ≈ model size × 1.2 + 0.8 GB (for context). With a discrete NVIDIA/AMD GPU, Jiv's budget is VRAM − 0.5 GB. Without one, it's RAM minus 1.5–4 GB left for Windows. Integrated Intel GPUs are ignored. Disk needs model size × 1.1 + 2 GB free. Speed is estimated from model size, GPU/CPU/split mode, thread count and AVX2. Among general models with tool support, Jiv picks the smartest one that fits entirely on the GPU at ≥10 tokens/s, then any that reach ≥10 tokens/s, then ≥6. The estimates are rough guides, not benchmarks.
 
 ## Download JivSetup.exe from GitHub Releases
-1. Open **https://github.com/aamitojj/jiv-desktop/releases/latest** (the repo is private, so sign in to GitHub with an account that has access first).
-2. Under **Assets**, download **`JivSetup.exe`** (the installer). `JivDesktop-portable-win64.zip` is a no-install copy: unzip it and run `JivDesktop.exe`.
+1. Open **https://github.com/aamitojj/jiv-desktop/releases/latest**. The repo is public, so you don't need a GitHub account. Direct link: https://github.com/aamitojj/jiv-desktop/releases/latest/download/JivSetup.exe
+2. Under **Assets**, download **`JivSetup.exe`** (the installer). `JivDesktop-portable-win64.zip` is a no-install copy: unzip it and run `JivDesktop.exe`. `jiv-x.y.z-all-in-one.jivupdate` updates an existing install (1.5.1 or newer) in place through **⬆ Updates → Install update file…**.
 3. Run `JivSetup.exe` as described in the next section.
 
 Every build is also kept as a workflow artifact: **Actions → Build Windows installer → (a run) → Artifacts**.
@@ -53,7 +54,7 @@ The workflow `.github/workflows/build-windows.yml` builds the installer on `wind
    git push origin main v1.6.3
    ```
 3. Wait about 5–10 minutes. The release `v1.6.3` then appears with `JivSetup.exe` attached. To make a test build without a release, open **Actions → Build Windows installer → Run workflow**.
-4. Signed `.jivupdate` packages are made separately with `tools/make_update.py` and your private key, which never goes into this repo. You can upload one to the release by hand.
+4. Signed `.jivupdate` packages are made separately with `tools/make_update.py` and your private key, which never goes into this repo. Upload one with `gh release upload vX.Y.Z jiv-X.Y.Z-all-in-one.jivupdate`. In-app *Check for updates* prefers an `all-in-one` package.
 
 ## Install on Windows: JivSetup.exe (recommended)
 1. Download **`JivSetup.exe`** (see above) and double-click it.
@@ -272,7 +273,7 @@ The recommended default for a 4 GB GPU is **`huihui_ai/qwen2.5-abliterate:3b`** 
 ## ⬆ Updates (version 1.1.0+)
 Open **⬆ Updates** in the sidebar, or go to Settings → Updates & backups. An update can come in three ways:
 1. **Update file.** Click *Install update file…* and choose a `.jivupdate` file.
-2. **GitHub Releases.** Put your repository (`owner/repo`) under *Source* and click *Check for updates*. Jiv looks at the latest release and downloads its `.jivupdate` asset. No repository is set by default, so Jiv never checks on its own until you add one.
+2. **GitHub Releases.** Click *Check for updates*. By default (since 1.6.3) Jiv checks the official public repo `aamitojj/jiv-desktop`. To use your own fork, put `owner/repo` under *Source*. Jiv reads the latest release and downloads its `.jivupdate` asset (preferring an `all-in-one` package). If the release only has `JivSetup.exe`, Jiv offers *Download & run installer…*. Jiv only checks when you click, unless you turn on *Auto-install signed updates*, which is off by default. GitHub allows 60 checks per hour without sign-in.
 3. **Jiv writes its own update.** Ask in chat, for example "add a feature that…". Jiv uses the `propose_update` tool, which needs your permission first. It syntax-checks every Python file and runs the test suite in a temporary copy of the app. Then it shows a card with the changelog, the check results and a diff for each file.
 
 Whichever way an update arrives, nothing changes until you click **Apply update…** and allow the exact action on the permission card. After that, Jiv:

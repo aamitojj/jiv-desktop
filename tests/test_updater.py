@@ -159,5 +159,13 @@ for f in ("make_update.py",):
     o = subprocess.run([sys.executable, str(APP / "tools/make_update.py"), "--old", str(APP), "--new", str(nd), "--version", "1.2.7", "-o", str(P("mk_req.jivupdate"))], capture_output=True, text=True)
     check("make_update picks up new requirements.txt lines", o.returncode == 0 and json.loads(zipfile.ZipFile(P("mk_req.jivupdate")).read("manifest.json"))["requirements"] == ["rich>=13"], o.stdout + o.stderr)
 
+# 1.6.3: official default repo + package choice
+from jiv import updater as _UPD
+check("empty repo → official aamitojj/jiv-desktop", _UPD.effective_repo("") == "aamitojj/jiv-desktop" and _UPD.effective_repo("  ") == "aamitojj/jiv-desktop")
+check("user repo still wins", _UPD.effective_repo("me/fork") == "me/fork")
+_assets = [{"name": "JivSetup.exe", "size": 9}, {"name": "jiv-1.6.3-english.jivupdate", "size": 50}, {"name": "jiv-1.6.3-all-in-one.jivupdate", "size": 40}]
+check("all-in-one .jivupdate preferred over a smaller step package", _UPD._pick_package(_assets)["name"] == "jiv-1.6.3-all-in-one.jivupdate")
+check("no .jivupdate → None", _UPD._pick_package([{"name": "JivSetup.exe"}]) is None)
+
 shutil.rmtree(TMP, ignore_errors=True)
 print(f"\n{sum(res)}/{len(res)} passed"); sys.exit(0 if all(res) else 1)
